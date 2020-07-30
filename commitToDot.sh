@@ -13,11 +13,14 @@ function gcommit {
     echo "\"${sha}\" -> \"${treeSha}\";" >> ${edgesFile}
 
     #get and process parents
-    for parentSha in $(git dump ${sha} | grep parent | awk '{print $2}')
-    do
-        gcommit ${parentSha}
-        echo "\"${sha}\" -> \"${parentSha}\";" >> ${edgesFile}
-    done
+    if [[ $(git dump ${sha} | grep parent) ]] ;then
+        while read -r i; do
+        local parentSha=${i}
+        echo ${parentSha}
+            gcommit ${parentSha}
+            echo "\"${sha}\" -> \"${parentSha}\";" >> ${edgesFile}
+        done <<< $(git dump ${sha} | grep parent | awk '{print $2}')
+    fi
 }
 
 function gtree {
@@ -47,7 +50,7 @@ function gblob {
     local content=$(git dump ${sha})
 
     # write tree node
-    echo "${sha} [label=\"<b:${sha:0:7}>\n${content}\"];" >> ${blobsFile}
+    echo "${sha} [label=\"<b:${sha:0:7}>\n${content:0:15}...\"];" >> ${blobsFile}
 }
 
 edgesFile=/tmp/ctd_edges
