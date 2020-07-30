@@ -68,18 +68,18 @@ cat > ${dotBuffer} << EOM
 digraph {
     subgraph cluster_c {
     label = "Commits";
-$(cat ${commitsFile})
+$(cat ${commitsFile} | sort | uniq)
     }
 
     subgraph cluster_t {
     label = "Trees";
-$(cat ${treesFile})
+$(cat ${treesFile} | sort | uniq)
     }
     subgraph cluster_b {
     label = "Blobs";
-$(cat ${blobsFile})
+$(cat ${blobsFile} | sort | uniq)
     }
-$(cat ${edgesFile})
+$(cat ${edgesFile} | sort | uniq)
 }
 EOM
 
