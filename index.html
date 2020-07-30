@@ -1,0 +1,10 @@
+<img src='graph.png' />
+<script type="text/javascript">
+const image=document.getElementsByTagName('img')[0];
+let i=0;
+function refraiche(){
+	image.src=`graph.png?cacheBreaker=${i++}`;
+	setTimeout(refraiche,250);
+}
+refraiche();
+</script>
