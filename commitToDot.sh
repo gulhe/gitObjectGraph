@@ -5,21 +5,20 @@ function gcommit {
 
     # write commit node
     local message=$(git log --format=%B -n 1 ${sha})
-    echo "\"${sha}\" [label=\"<c:${sha:0:7}>\n${message}\"];" >> ${commitsFile}
+    echo "\"${sha}\" [label=\"<c:${sha:0:7}>\n${message:0:5}\"];" >> ${commitsFile}
 
     #get and process tree
-    local treeSha=$(git dump ${sha} | grep tree | awk '{print $2}')
+    local treeSha=$(git dump ${sha} | grep ^tree | awk '{print $2}')
     gtree ${treeSha}
     echo "\"${sha}\" -> \"${treeSha}\";" >> ${edgesFile}
 
     #get and process parents
-    if [[ $(git dump ${sha} | grep parent) ]] ;then
+    if [[ $(git dump ${sha} | grep ^parent) ]] ;then
         while read -r i; do
-        local parentSha=${i}
-        echo ${parentSha}
+            local parentSha=${i}
             gcommit ${parentSha}
             echo "\"${sha}\" -> \"${parentSha}\";" >> ${edgesFile}
-        done <<< $(git dump ${sha} | grep parent | awk '{print $2}')
+        done <<< $(git dump ${sha} | grep ^parent | awk '{print $2}')
     fi
 }
 
@@ -47,10 +46,10 @@ function gtree {
 
 function gblob {
     local sha=${1}
-    local content=$(git dump ${sha})
+    local content=$(git dump ${sha}|tail -n 1)
 
     # write tree node
-    echo "${sha} [label=\"<b:${sha:0:7}>\n${content:0:15}...\"];" >> ${blobsFile}
+    echo "\"${sha}\" [label=\"<b:${sha:0:7}>\n${content:0:15}...\"];" >> ${blobsFile}
 }
 
 edgesFile=/tmp/ctd_edges
