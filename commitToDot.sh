@@ -4,8 +4,8 @@ function gcommit {
     local sha=${1}
 
     # write commit node
-    local message=$(git log --oneline -1 --decorate=false ${sha})
-    echo "\"${sha}\" [label=\"c:${message}\"];" >> ${commitsFile}
+    local message=$(git log --format=%B -n 1 ${sha})
+    echo "\"${sha}\" [label=\"<c:${sha:0:7}>\n${message}\"];" >> ${commitsFile}
 
     #get and process tree
     local treeSha=$(git dump ${sha} | grep tree | awk '{print $2}')
@@ -24,7 +24,7 @@ function gtree {
     local sha=${1}
 
     # write tree node
-    echo "\"${sha}\";" >> ${treesFile}
+    echo "\"${sha}\" [label=\"<t:${sha:0:7}>\"];" >> ${treesFile}
 
     #get and process subs
 
@@ -47,7 +47,7 @@ function gblob {
     local content=$(git dump ${sha})
 
     # write tree node
-    echo "${sha} [label=\"b:${sha}|${content}\"];" >> ${blobsFile}
+    echo "${sha} [label=\"<b:${sha:0:7}>\n${content}\"];" >> ${blobsFile}
 }
 
 edgesFile=/tmp/ctd_edges
